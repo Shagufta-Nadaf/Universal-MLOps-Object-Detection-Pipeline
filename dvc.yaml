@@ -1,0 +1,101 @@
+# =============================================================================
+# dvc.yaml — DVC Pipeline Definition
+# Run:  dvc repro        → execute all stages in order
+#       dvc repro train   → run only the train stage (and its dependencies)
+#       dvc dag           → visualize the pipeline DAG
+# =============================================================================
+
+stages:
+
+  # ── Stage 1: Download ───────────────────────────────────────────────────────
+  download:
+    cmd: python src/data/download_data.py
+    deps:
+      - src/data/download_data.py
+      - params.yaml
+    params:
+      - data.workspace
+      - data.project
+      - data.roboflow_version
+      - data.format
+      - paths.raw_data
+    outs:
+      - data/raw:
+          cache: true    # DVC stores this in its cache
+          persist: true  # don't delete between runs if unchanged
+
+  # ── Stage 2: Preprocess ─────────────────────────────────────────────────────
+  preprocess:
+    cmd: python src/data/preprocess.py
+    deps:
+      - src/data/preprocess.py
+      - data/raw
+      - params.yaml
+    params:
+      - data.classes
+      - paths.raw_data
+      - paths.processed_data
+    outs:
+      - data/processed:
+          cache: true
+          persist: true
+
+  # ── Stage 3: Split ──────────────────────────────────────────────────────────
+  split:
+    cmd: python src/data/split_data.py
+    deps:
+      - src/data/split_data.py
+      - data/processed
+      - params.yaml
+    params:
+      - split.seed
+      - split.train_ratio
+      - split.val_ratio
+      - data.version
+      - paths.processed_data
+      - paths.splits_dir
+    outs:
+      - data/splits:
+          cache: false   # small text files — track in Git directly
+
+  # ── Stage 4: Train ──────────────────────────────────────────────────────────
+  train:
+    cmd: python src/training/train.py
+    deps:
+      - src/training/train.py
+      - src/tracking/mlflow_logger.py
+      - data/splits
+      - data/processed
+      - configs/dataset.yaml
+      - params.yaml
+    params:
+      - train.model
+      - train.epochs
+      - train.batch_size
+      - train.image_size
+      - train.learning_rate
+      - train.patience
+      - train.device
+      - data.version
+      - mlflow.experiment_name
+      - paths.models_dir
+    outs:
+      - models:
+          cache: true
+          persist: true
+    metrics:
+      - metrics.json:
+          cache: false
+
+  # ── Stage 5: Evaluate ───────────────────────────────────────────────────────
+  evaluate:
+    cmd: python src/training/evaluate.py
+    deps:
+      - src/training/evaluate.py
+      - models
+      - data/splits
+      - data/processed
+      - params.yaml
+    metrics:
+      - eval_metrics.json:
+          cache: false

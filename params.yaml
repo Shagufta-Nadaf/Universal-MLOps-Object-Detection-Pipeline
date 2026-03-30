@@ -1,0 +1,49 @@
+# =============================================================================
+# params.yaml — Versioned Pipeline Parameters
+# Tracked by both Git and DVC so every experiment is fully reproducible.
+# Change values here before running a new experiment version.
+# =============================================================================
+
+# ─── Dataset ──────────────────────────────────────────────────────────────────
+data:
+  version: "v1"                          # bump to v2, v3 as dataset evolves
+  source: "roboflow"
+  workspace: "kitti-bounding-boxes"      # Roboflow workspace name
+  project: "kitti-dataset-object-detect" # Roboflow project name
+  roboflow_version: 1                    # dataset version on Roboflow
+  format: "yolov8"
+  classes:
+    - car
+    - pedestrian
+    - cyclist
+    - traffic_sign
+
+# ─── Split ────────────────────────────────────────────────────────────────────
+split:
+  seed: 42          # fixed seed → same split every run
+  train_ratio: 0.80
+  val_ratio: 0.20
+
+# ─── Training ─────────────────────────────────────────────────────────────────
+train:
+  model: "yolov8n.pt"        # nano model — fast on CPU; swap for yolov8s.pt for higher accuracy
+  epochs: 30
+  batch_size: 16
+  image_size: 640
+  learning_rate: 0.01
+  patience: 10               # early stopping patience
+  device: "auto"             # "auto" → GPU if available else CPU
+  workers: 4
+
+# ─── MLflow ───────────────────────────────────────────────────────────────────
+mlflow:
+  experiment_name: "road-detection"
+  tracking_uri: "mlruns"     # local folder; change to http://... for remote server
+
+# ─── Paths ────────────────────────────────────────────────────────────────────
+paths:
+  raw_data: "data/raw"
+  processed_data: "data/processed"
+  splits_dir: "data/splits"
+  models_dir: "models"
+  dataset_yaml: "configs/dataset.yaml"

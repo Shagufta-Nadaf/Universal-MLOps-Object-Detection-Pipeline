@@ -1,0 +1,30 @@
+# ─── Core ML ───────────────────────────────────────────────────────────────────
+ultralytics>=8.2.0          # YOLOv8 model training & inference
+torch>=2.0.0                # PyTorch backend (CPU or CUDA)
+torchvision>=0.15.0
+
+# ─── Data & Processing ─────────────────────────────────────────────────────────
+opencv-python>=4.8.0        # Image I/O and drawing
+Pillow>=10.0.0              # Image utilities
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0         # Train/Val split utilities
+tqdm>=4.66.0                # Progress bars
+
+# ─── MLOps ─────────────────────────────────────────────────────────────────────
+mlflow>=2.13.0              # Experiment tracking (local)
+dvc>=3.50.0                 # Data & pipeline versioning
+roboflow>=1.1.0             # Dataset download from Roboflow Universe
+
+# ─── Config & Utils ────────────────────────────────────────────────────────────
+pyyaml>=6.0                 # YAML config parsing
+python-dotenv>=1.0.0        # .env file support (API keys)
+click>=8.1.0                # CLI argument parsing
+
+# ─── Visualization ─────────────────────────────────────────────────────────────
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# ─── Notebook ──────────────────────────────────────────────────────────────────
+jupyter>=1.0.0
+ipywidgets>=8.0.0

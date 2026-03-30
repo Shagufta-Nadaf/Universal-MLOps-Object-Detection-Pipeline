@@ -1,0 +1,55 @@
+# ─── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.Python
+env/
+venv/
+.venv/
+pip-wheel-metadata/
+
+# ─── Environment & Secrets ─────────────────────────────────────────────────────
+.env
+.env.*
+*.key
+
+# ─── Data (tracked by DVC, not Git) ────────────────────────────────────────────
+data/raw/
+data/processed/
+# splits ARE tracked by git (small text index files)
+!data/splits/
+
+# ─── Model Weights (tracked by DVC) ────────────────────────────────────────────
+models/*.pt
+models/*.pth
+models/*.onnx
+
+# ─── MLflow ────────────────────────────────────────────────────────────────────
+mlruns/
+
+# ─── YOLOv8 run outputs ────────────────────────────────────────────────────────
+runs/
+
+# ─── Jupyter ───────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ─── IDE ───────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ─── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── DVC internals ─────────────────────────────────────────────────────────────
+.dvc/tmp/
+.dvc/cache/

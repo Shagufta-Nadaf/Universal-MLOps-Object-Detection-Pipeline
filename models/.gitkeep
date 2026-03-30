@@ -1,0 +1,2 @@
+# Placeholder to keep the models/ directory tracked in Git
+# Actual model weights (.pt files) are tracked via DVC, not Git.

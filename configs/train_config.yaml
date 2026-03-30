@@ -1,0 +1,61 @@
+# =============================================================================
+# configs/train_config.yaml — Training Hyperparameter Reference
+# Note: actual values are read from params.yaml (DVC-tracked).
+# This file serves as a comment/documentation layer for each hyperparameter.
+# =============================================================================
+
+hyperparameters:
+
+  model:
+    description: "YOLOv8 variant to use. Options: yolov8n, yolov8s, yolov8m, yolov8l, yolov8x"
+    note: "n=nano (fastest, smallest), x=xlarge (most accurate, slowest)"
+
+  epochs:
+    description: "Number of full passes through the training data"
+    note: "30 epochs is good for a quick experiment. 100+ for final models."
+
+  batch_size:
+    description: "Images processed per gradient update"
+    note: "Reduce to 8 if GPU memory error. Increase to 32 for faster training on a strong GPU."
+
+  image_size:
+    description: "Input image resolution (square). YOLO resizes all images to this."
+    note: "640 is standard. 416 is faster. 1280 is more accurate but much slower."
+
+  learning_rate:
+    description: "Initial learning rate for SGD optimizer"
+    note: "YOLOv8 uses cosine LR scheduling by default."
+
+  patience:
+    description: "Early stopping — stop if no mAP improvement after N epochs"
+    note: "Prevents overfitting and wasted compute time."
+
+  device:
+    description: "Training device"
+    options:
+      - "auto"  # GPU if CUDA available, else CPU
+      - "0"     # Specific GPU index
+      - "cpu"   # Force CPU
+
+# ─── Ablation guide ───────────────────────────────────────────────────────────
+experiment_ideas:
+  - name: "baseline"
+    model: yolov8n.pt
+    epochs: 30
+    batch_size: 16
+    image_size: 640
+    lr: 0.01
+
+  - name: "larger_model"
+    model: yolov8s.pt
+    epochs: 30
+    batch_size: 8
+    image_size: 640
+    lr: 0.01
+
+  - name: "high_resolution"
+    model: yolov8n.pt
+    epochs: 30
+    batch_size: 8
+    image_size: 1280
+    lr: 0.005
