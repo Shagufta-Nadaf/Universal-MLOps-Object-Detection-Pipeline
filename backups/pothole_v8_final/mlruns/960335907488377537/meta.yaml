@@ -1,0 +1,7 @@
+artifact_location: file:///D:/ML_PROJECTS/MLOPS/mlruns/960335907488377537
+creation_time: 1774932675442
+experiment_id: '960335907488377537'
+last_update_time: 1774932675442
+lifecycle_stage: active
+name: road-detection
+workspace: default

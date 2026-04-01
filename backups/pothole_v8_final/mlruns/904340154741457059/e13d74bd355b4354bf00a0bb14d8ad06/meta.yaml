@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/ML_PROJECTS/MLOPS/mlruns/904340154741457059/e13d74bd355b4354bf00a0bb14d8ad06/artifacts
+end_time: 1774953025127
+entry_point_name: ''
+experiment_id: '904340154741457059'
+lifecycle_stage: active
+run_id: e13d74bd355b4354bf00a0bb14d8ad06
+run_name: fearless-vole-144
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1774953023202
+status: 3
+tags: []
+user_id: Win-10

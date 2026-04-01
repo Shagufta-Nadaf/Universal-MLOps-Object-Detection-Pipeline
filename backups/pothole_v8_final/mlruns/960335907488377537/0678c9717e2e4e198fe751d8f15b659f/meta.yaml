@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/ML_PROJECTS/MLOPS/mlruns/960335907488377537/0678c9717e2e4e198fe751d8f15b659f/artifacts
+end_time: 1774936974873
+entry_point_name: ''
+experiment_id: '960335907488377537'
+lifecycle_stage: active
+run_id: 0678c9717e2e4e198fe751d8f15b659f
+run_name: potholes-v6-early-stop
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1774935408986
+status: 3
+tags: []
+user_id: Win-10

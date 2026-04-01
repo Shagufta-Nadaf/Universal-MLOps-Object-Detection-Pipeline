@@ -1,0 +1,7 @@
+artifact_location: file:///D:/ML_PROJECTS/MLOPS/mlruns/904340154741457059
+creation_time: 1774932681123
+experiment_id: '904340154741457059'
+last_update_time: 1774932681123
+lifecycle_stage: active
+name: runs/train
+workspace: default

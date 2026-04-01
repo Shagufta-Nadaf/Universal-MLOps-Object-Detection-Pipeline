@@ -23,15 +23,23 @@ import argparse
 import datetime
 import hashlib
 import os
+import shutil
 import sys
 from pathlib import Path
+from roboflow import Roboflow
 
 # Allow running from project root:  python src/data/download_data.py
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from dotenv import load_dotenv
 
-from src.utils.helpers import ensure_dirs, load_params, setup_logger, write_dataset_manifest
+from src.utils.helpers import (
+    ensure_dirs,
+    get_dataset_paths,
+    load_params,
+    setup_logger,
+    write_dataset_manifest
+)
 
 load_dotenv()  # load .env if present
 logger = setup_logger("download_data")
@@ -83,17 +91,12 @@ def download_dataset(
     logger.info(f"  Format    : {fmt}")
     logger.info(f"  Output    : {output_dir}")
 
-    if dry_run:
-        logger.info("  [DRY RUN] — skipping actual download.")
-        return output_dir
-
-    try:
-        from roboflow import Roboflow
-    except ImportError:
-        logger.error("roboflow package not installed. Run: pip install roboflow")
-        sys.exit(1)
-
-    ensure_dirs(output_dir)
+    if not dry_run:
+        # CRITICAL: Wipe raw_data directory before downloading new project to avoid mixing datasets
+        if output_dir.exists():
+            shutil.rmtree(output_dir)
+            logger.info("  ✓ Cleaned raw data directory (no mixing!)")
+        ensure_dirs(output_dir)
 
     logger.info("  Connecting to Roboflow...")
     rf = Roboflow(api_key=api_key)
@@ -105,11 +108,32 @@ def download_dataset(
     dataset = project_obj.version(version).download(
         model_format=fmt,
         location=str(output_dir),
-        overwrite=False,  # skip if already downloaded
+        overwrite=True,
     )
 
     dataset_path = Path(dataset.location)
-    logger.info(f"  ✓ Dataset saved to: {dataset_path}")
+    logger.info(f"  Dataset location (from SDK): {dataset_path}")
+
+    # Verify actual files exist at dataset_path
+    img_count = len(list(dataset_path.rglob("*.jpg"))) + \
+                len(list(dataset_path.rglob("*.png")))
+    logger.info(f"  Images found at dataset_path: {img_count}")
+
+    # If files are not inside our output_dir, copy them in
+    if not str(dataset_path).startswith(str(output_dir.resolve())):
+        logger.info(f"  Copying from {dataset_path} to {output_dir}")
+        dest = output_dir / dataset_path.name
+        if dest.exists():
+            shutil.rmtree(dest)
+        shutil.copytree(str(dataset_path), str(dest))
+        dataset_path = dest
+        logger.info(f"  Copied to: {dataset_path}")
+
+    # Save the actual dataset_path so preprocess.py can find it
+    location_file = output_dir / "dataset_location.txt"
+    location_file.write_text(str(dataset_path))
+    logger.info(f"  Saved dataset location to: {location_file}")
+    logger.info(f"  Final dataset path: {dataset_path}")
     return dataset_path
 
 
@@ -168,7 +192,10 @@ def main():
     version    = int(data_cfg.get("roboflow_version", ROBOFLOW_VERSION))
     fmt        = data_cfg.get("format", "yolov8")
     ver_tag    = data_cfg.get("version", "v1")
-    output_dir = Path(paths_cfg["raw_data"])
+    
+    # ── Resolve dataset-specific path ────────────────────────────────────────
+    ds_paths   = get_dataset_paths(params)
+    output_dir = ds_paths["raw"]
 
     # ── Resolve API key (priority: CLI > env > .env) ─────────────────────────
     api_key = args.api_key or os.environ.get("ROBOFLOW_API_KEY")

@@ -1,0 +1,12 @@
+names:
+- Palm
+nc: 1
+roboflow:
+  license: MIT
+  project: face-human-b8pto
+  url: https://universe.roboflow.com/kmitl-g30kx/face-human-b8pto/dataset/1
+  version: 1
+  workspace: kmitl-g30kx
+test: ../test/images
+train: ../train/images
+val: ../valid/images

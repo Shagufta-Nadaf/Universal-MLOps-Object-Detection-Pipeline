@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/ML_PROJECTS/MLOPS/mlruns/470348212701350236/f4d53e9da5944d0ea4c5e0c4d0c20995/artifacts
+end_time: 1774973972036
+entry_point_name: ''
+experiment_id: '470348212701350236'
+lifecycle_stage: active
+run_id: f4d53e9da5944d0ea4c5e0c4d0c20995
+run_name: marvelous-shad-238
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1774973969685
+status: 3
+tags: []
+user_id: Win-10

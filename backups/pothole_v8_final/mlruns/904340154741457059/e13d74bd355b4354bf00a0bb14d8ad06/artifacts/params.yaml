@@ -1,0 +1,32 @@
+data:
+  version: v14
+  source: roboflow
+  workspace: kmitl-g30kx
+  project: face-human-b8pto
+  roboflow_version: 1
+  format: yolov8
+  classes:
+  - pothole
+split:
+  seed: 42
+  train_ratio: 0.8
+  val_ratio: 0.2
+  max_images: 100
+train:
+  model: yolov8n.pt
+  epochs: 10
+  batch_size: 4
+  image_size: 320
+  learning_rate: 0.01
+  patience: 5
+  device: cpu
+  workers: 0
+mlflow:
+  experiment_name: road-detection
+  tracking_uri: mlruns
+paths:
+  raw_data: data/raw
+  processed_data: data/processed
+  splits_dir: data/splits
+  models_dir: models
+  dataset_yaml: configs/dataset.yaml

@@ -1,19 +1,5 @@
-# =============================================================================
-# configs/dataset.yaml — YOLO Dataset Configuration
-# Used directly by Ultralytics YOLOv8 trainer.
-# Paths are relative to the project root.
-# =============================================================================
-
-path: .                         # Root of the project
-train: data/processed/images/train
-val:   data/processed/images/val
-
-# Number of classes
-nc: 4
-
-# Class names — order matters! Must match label index 0,1,2,3
 names:
-  0: car
-  1: pedestrian
-  2: cyclist
-  3: traffic_sign
+  0: Palm
+path: D:\ML_PROJECTS\MLOPS\data\processed
+train: images/train
+val: images/val

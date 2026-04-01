@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/ML_PROJECTS/MLOPS/mlruns/960335907488377537/b5f47e84484d4fb2a8053494639b15a7/artifacts
+end_time: 1774951061330
+entry_point_name: ''
+experiment_id: '960335907488377537'
+lifecycle_stage: active
+run_id: b5f47e84484d4fb2a8053494639b15a7
+run_name: potholes-detection-fwhfx-v11
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1774950017406
+status: 3
+tags: []
+user_id: Win-10

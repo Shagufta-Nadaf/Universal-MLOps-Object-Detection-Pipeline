@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/ML_PROJECTS/MLOPS/mlruns/960335907488377537/48aa85225fe34b1796114a70dd1a36fe/artifacts
+end_time: 1774953022718
+entry_point_name: ''
+experiment_id: '960335907488377537'
+lifecycle_stage: active
+run_id: 48aa85225fe34b1796114a70dd1a36fe
+run_name: face-human-b8pto-v14
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1774952672924
+status: 3
+tags: []
+user_id: Win-10

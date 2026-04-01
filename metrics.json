@@ -1,0 +1,10 @@
+{
+  "mAP50": 0.995,
+  "mAP50_95": 0.7662969226970207,
+  "precision": 0.9939165844071808,
+  "recall": 1.0,
+  "box_loss": 0.0,
+  "cls_loss": 0.0,
+  "run_name": "face-human-b8pto-v28",
+  "model_version": "v1"
+}

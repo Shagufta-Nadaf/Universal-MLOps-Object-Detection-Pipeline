@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shagufta's AI Studio</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <header>
+        <h1>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v20"></path>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+            Shagufta's AI Studio
+        </h1>
+    </header>
+
+    <main>
+        <!-- Left Panel: Form & Settings -->
+        <aside class="panel">
+            <div class="panel-title">
+                <span>Training Configuration</span>
+                <span id="statusBadge" class="status-badge status-idle">IDLE</span>
+            </div>
+            
+            <form id="trainForm">
+                <div class="form-group">
+                    <label for="api_key">Roboflow API Key (First run only)</label>
+                    <input type="password" id="api_key" name="api_key" placeholder="Enter API Key">
+                </div>
+
+                <div class="form-group">
+                    <label for="workspace">Workspace ID</label>
+                    <input type="text" id="workspace" name="workspace" placeholder="e.g. learning-v1all" required value="learning-v1all">
+                </div>
+
+                <div class="form-group">
+                    <label for="project">Project ID</label>
+                    <input type="text" id="project" name="project" placeholder="e.g. potholes-detection-fwhfx" required value="potholes-detection-fwhfx">
+                </div>
+
+                <div class="form-group">
+                    <label for="version">Dataset Version</label>
+                    <input type="number" id="version" name="version" placeholder="e.g. 2" required min="1" value="2">
+                </div>
+
+                <hr>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label title="Lower avoids RAM crashes" for="max_images">Max Images</label>
+                        <input type="number" id="max_images" name="max_images" value="400" min="10">
+                    </div>
+                    <div class="form-group">
+                        <label title="Stops early automatically" for="epochs">Epochs</label>
+                        <input type="number" id="epochs" name="epochs" value="30" min="1">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label title="640=HD, 320=Fast/Low-RAM" for="image_size">Image Size (px)</label>
+                    <input type="number" id="image_size" name="image_size" value="320" step="32">
+                </div>
+
+                <div class="row" style="gap: 1rem; margin-top: 1rem;">
+                    <button type="submit" id="submitBtn" class="btn-primary" style="flex: 2;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                        <span id="btnText">Start Training</span>
+                    </button>
+                    
+                    <button type="button" id="stopBtn" class="btn-outline" style="flex: 1; border-color: #ef4444; color: #f87171; display: none; margin-top: 0;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        </svg>
+                        Stop
+                    </button>
+                </div>
+            </form>
+
+            <div id="trainingProgress" class="progress-container">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+
+            <!-- Results Section (Hidden initially) -->
+            <div id="resultsPanel" style="margin-top: 2rem;">
+                <hr>
+                <div class="panel-title">
+                    <span style="color: var(--success); display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        Training Complete
+                    </span>
+                </div>
+
+                <div class="metric-row">
+                    <div class="metric-header">
+                        <span>mAP@50</span>
+                        <span id="mAP50Val" class="metric-value">--%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div id="mAP50Bar" class="progress-bar-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="metric-row">
+                    <div class="metric-header">
+                        <span>Precision</span>
+                        <span id="precisionVal" class="metric-value">--%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div id="precisionBar" class="progress-bar-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="metric-row">
+                    <div class="metric-header">
+                        <span>Recall</span>
+                        <span id="recallVal" class="metric-value">--%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div id="recallBar" class="progress-bar-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <a href="/download/model" target="_blank" class="btn-primary" style="margin-top: 1.5rem; text-decoration: none;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download Model (.pt)
+                </a>
+
+                <a href="/download/confusion_matrix" target="_blank" class="btn-outline" style="margin-top: 0.5rem;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Download Confusion Matrix (.zip)
+                </a>
+
+                <a href="/download/val_predictions" target="_blank" class="btn-outline" style="margin-top: 0.5rem;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Download Val Predictions (.zip)
+                </a>
+                
+                <a href="/download/metrics" target="_blank" class="btn-outline" style="margin-top: 0.5rem;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    View Complete Metrics JSON
+                </a>
+            </div>
+
+        </aside>
+
+        <!-- Right Panel: Live Logs -->
+        <div class="panel">
+            <div class="panel-title">
+                <span><pre style="display:inline; color: var(--text-muted); font-size: 0.9rem;">$</pre> Live Pipeline Terminal</span>
+                <span style="display: flex; gap: 6px;">
+                    <span style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></span>
+                    <span style="width: 12px; height: 12px; border-radius: 50%; background: #eab308;"></span>
+                    <span style="width: 12px; height: 12px; border-radius: 50%; background: #22c55e;"></span>
+                </span>
+            </div>
+            <div id="logs" class="logs-container">
+                <div>Waiting for training to start...</div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

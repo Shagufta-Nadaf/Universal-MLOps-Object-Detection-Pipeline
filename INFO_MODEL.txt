@@ -1,0 +1,59 @@
+2026-03-31 12:54:41 | INFO     | evaluate |   Model      : models\yolov8_road_v3.pt
+INFO:evaluate:  Model      : models\yolov8_road_v3.pt
+2026-03-31 12:54:41 | INFO     | evaluate |   Dataset    : configs\dataset.yaml
+INFO:evaluate:  Dataset    : configs\dataset.yaml
+2026-03-31 12:54:41 | INFO     | evaluate |   Save plots : False
+INFO:evaluate:  Save plots : False
+Ultralytics 8.4.31  Python-3.11.15 torch-2.11.0+cpu CPU (Intel Core i5-8265U 1.60GHz)
+Model summary (fused): 73 layers, 3,005,843 parameters, 0 gradients, 8.1 GFLOPs
+val: Fast image access  (ping: 0.10.0 ms, read: 272.9104.7 MB/s, size: 58.5 KB)
+val: Scanning D:\ML_PROJECTS\MLOPS\data\processed\labels\val.cache... 119 images, 0 backgrounds, 0 corrupt: 100% ━━━━━━━━━━━━ 119/119  0.0s
+WARNING Box and segment counts should be equal, but got len(segments) = 253, len(boxes) = 263. To resolve this only boxes will be used and all segments will be removed. To avoid this please supply either a detect or segment dataset, not a detect-segment mixed dataset.
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 8/8 1.2it/s 6.4s
+                   all        119        263      0.636      0.555      0.591      0.343
+Speed: 0.7ms preprocess, 43.0ms inference, 0.0ms loss, 1.3ms postprocess per image
+2026-03-31 12:54:47 | INFO     | evaluate |
+INFO:evaluate:
+2026-03-31 12:54:47 | INFO     | evaluate |   ── Evaluation Results ──────────────────────────
+INFO:evaluate:  ── Evaluation Results ──────────────────────────
+2026-03-31 12:54:47 | INFO     | evaluate |   mAP@50       : 0.5906
+INFO:evaluate:  mAP@50       : 0.5906
+2026-03-31 12:54:47 | INFO     | evaluate |   mAP@50-95    : 0.3433
+INFO:evaluate:  mAP@50-95    : 0.3433
+2026-03-31 12:54:47 | INFO     | evaluate |   Precision    : 0.6361
+INFO:evaluate:  Precision    : 0.6361
+2026-03-31 12:54:47 | INFO     | evaluate |   Recall       : 0.5551
+INFO:evaluate:  Recall       : 0.5551
+2026-03-31 12:54:47 | INFO     | evaluate |   ── Per-Class AP@50 ─────────────────────────────
+INFO:evaluate:  ── Per-Class AP@50 ─────────────────────────────
+2026-03-31 12:54:47 | INFO     | evaluate |     pothole              0.5906
+INFO:evaluate:    pothole              0.5906
+2026-03-31 12:54:47 | INFO     | evaluate |   ────────────────────────────────────────────────
+INFO:evaluate:  ────────────────────────────────────────────────
+  ✓ Saved JSON → eval_metrics.json
+2026-03-31 12:54:47 | INFO     | run_pipeline |   ✅  evaluate completed in 6.7s
+INFO:run_pipeline:  ✅  evaluate completed in 6.7s
+2026-03-31 12:54:47 | INFO     | run_pipeline |
+INFO:run_pipeline:
+2026-03-31 12:54:47 | INFO     | run_pipeline | ============================================================
+INFO:run_pipeline:============================================================
+2026-03-31 12:54:47 | INFO     | run_pipeline |   ✅  Pipeline COMPLETE! (2657.7s total)
+INFO:run_pipeline:  ✅  Pipeline COMPLETE! (2657.7s total)
+2026-03-31 12:54:47 | INFO     | run_pipeline |
+INFO:run_pipeline:
+2026-03-31 12:54:47 | INFO     | run_pipeline |   What to do next:
+INFO:run_pipeline:  What to do next:
+2026-03-31 12:54:47 | INFO     | run_pipeline |     1. View experiments: mlflow ui
+INFO:run_pipeline:    1. View experiments: mlflow ui
+2026-03-31 12:54:47 | INFO     | run_pipeline |        → Open http://127.0.0.1:5000
+INFO:run_pipeline:       → Open http://127.0.0.1:5000
+2026-03-31 12:54:47 | INFO     | run_pipeline |     2. Run inference:
+INFO:run_pipeline:    2. Run inference:
+2026-03-31 12:54:47 | INFO     | run_pipeline |        → python scripts/run_inference.py --source path/to/images/
+INFO:run_pipeline:       → python scripts/run_inference.py --source path/to/images/
+2026-03-31 12:54:47 | INFO     | run_pipeline |     3. Try another experiment:
+INFO:run_pipeline:    3. Try another experiment:
+2026-03-31 12:54:47 | INFO     | run_pipeline |        → Edit params.yaml → python scripts/run_pipeline.py --start-from train
+INFO:run_pipeline:       → Edit params.yaml → python scripts/run_pipeline.py --start-from train
+2026-03-31 12:54:47 | INFO     | run_pipeline | ============================================================
+INFO:run_pipeline:============================================================

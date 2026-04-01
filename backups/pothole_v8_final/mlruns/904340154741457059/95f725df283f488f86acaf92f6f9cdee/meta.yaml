@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/ML_PROJECTS/MLOPS/mlruns/904340154741457059/95f725df283f488f86acaf92f6f9cdee/artifacts
+end_time: 1774936977639
+entry_point_name: ''
+experiment_id: '904340154741457059'
+lifecycle_stage: active
+run_id: 95f725df283f488f86acaf92f6f9cdee
+run_name: secretive-mule-785
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1774936976842
+status: 3
+tags: []
+user_id: Win-10

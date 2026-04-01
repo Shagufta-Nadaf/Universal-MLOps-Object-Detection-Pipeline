@@ -39,7 +39,7 @@ from src.utils.helpers import load_params, setup_logger
 
 logger = setup_logger("run_pipeline")
 
-STAGES = ["download", "preprocess", "split", "train", "evaluate"]
+STAGES = ["download", "preprocess", "split", "train", "evaluate", "inference"]
 
 
 def run_stage(name: str, fn, *args, **kwargs) -> bool:
@@ -128,13 +128,16 @@ def main():
 
     # ── Stage: Preprocess ─────────────────────────────────────────────────────
     if "preprocess" in active_stages and not failed_stage:
-        from src.data.preprocess import preprocess
+        from src.data.preprocess import preprocess, resolve_raw_dir
 
         paths_cfg = params["paths"]
+        raw_dir = Path(paths_cfg["raw_data"])
+        actual_raw_dir = resolve_raw_dir(raw_dir)  # find Roboflow subfolder
+
         ok = run_stage(
             "preprocess",
             preprocess,
-            raw_dir=Path(paths_cfg["raw_data"]),
+            raw_dir=actual_raw_dir,
             output_dir=Path(paths_cfg["processed_data"]),
         )
         if not ok:
@@ -157,6 +160,7 @@ def main():
             seed=int(split_cfg["seed"]),
             train_ratio=float(split_cfg["train_ratio"]),
             val_ratio=float(split_cfg["val_ratio"]),
+            max_images=int(split_cfg.get("max_images")) if split_cfg.get("max_images") else None,
         )
         if not ok:
             failed_stage = "split"
@@ -187,7 +191,7 @@ def main():
 
         if model_path:
             def _eval():
-                metrics = evaluate_model(model_path, dataset_yaml)
+                metrics = evaluate_model(model_path, dataset_yaml, save_plots=True)
                 print_metrics_table(metrics)
                 safe_metrics = {k: v for k, v in metrics.items() if isinstance(v, (int, float, str))}
                 safe_metrics["model"] = model_path.name
@@ -199,6 +203,45 @@ def main():
         else:
             logger.warning("  No model found for evaluation — skipping.")
 
+    # ── Stage: Inference ───────────────────────────────────────────────────
+    if "inference" in active_stages and not failed_stage:
+        from scripts.run_inference import run_inference
+
+        paths_cfg  = params["paths"]
+        models_dir = Path(paths_cfg["models_dir"])
+        val_images = Path(paths_cfg["processed_data"]) / "images" / "val"
+
+        # Auto-pick the best model (latest saved .pt)
+        model_candidates = sorted(models_dir.glob("yolov8_road_v*.pt"))
+        infer_model = model_candidates[-1] if model_candidates else None
+
+        if infer_model and val_images.exists():
+            out_dir = Path("runs") / "pipeline_inference"
+
+            def _infer():
+                run_inference(
+                    source=str(val_images),
+                    model_path=infer_model,
+                    conf=0.05,
+                    iou=0.45,
+                    save_output=True,
+                    output_dir=out_dir,
+                )
+
+            ok = run_stage("inference", _infer)
+            if not ok:
+                failed_stage = "inference"
+        else:
+            logger.warning("  No model or val images found — skipping inference.")
+
+    # ── Stage: Packaging ───────────────────────────────────────────────────────
+    if not failed_stage:
+        from src.utils.results_manager import package_run_results
+        try:
+            package_run_results(args.run_name or "no_name")
+        except Exception as e:
+            logger.error(f"  ❌  Packaging failed: {e}")
+
     # ── Final Summary ─────────────────────────────────────────────────────────
     elapsed_total = time.time() - pipeline_start
     logger.info("")
@@ -209,13 +252,14 @@ def main():
     else:
         logger.info(f"  ✅  Pipeline COMPLETE! ({elapsed_total:.1f}s total)")
         logger.info("")
-        logger.info("  What to do next:")
-        logger.info("    1. View experiments: mlflow ui")
-        logger.info("       → Open http://127.0.0.1:5000")
-        logger.info("    2. Run inference:")
-        logger.info("       → python scripts/run_inference.py --source path/to/images/")
-        logger.info("    3. Try another experiment:")
-        logger.info("       → Edit params.yaml → python scripts/run_pipeline.py --start-from train")
+        logger.info("  Results:")
+        logger.info("    📈 MLflow experiments  → run `mlflow ui` → http://127.0.0.1:5000")
+        logger.info("    📄 Eval metrics        → eval_metrics.json")
+        logger.info("    🖼  Annotated val images → runs\\pipeline_inference\\detect\\")
+        logger.info("    🤖 Model saved         → models\\yolov8_road_v*.pt")
+        logger.info("")
+        logger.info("  Next experiment:")
+        logger.info("    Edit params.yaml → python scripts/run_pipeline.py --start-from train")
     logger.info("=" * 60)
 
 

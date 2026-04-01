@@ -127,6 +127,13 @@ class MLflowLogger:
         df = pd.read_csv(results_csv)
         df.columns = df.columns.str.strip()  # strip whitespace from column names
 
+        def sanitize(name: str) -> str:
+            """MLflow metric names can't contain parentheses — replace them."""
+            return (name.replace("(", "_")
+                        .replace(")", "")
+                        .replace(" ", "_")
+                        .strip("_"))
+
         # Log epoch-by-epoch metrics as time series
         metric_cols = [c for c in df.columns if any(
             k in c.lower() for k in ["map", "loss", "precision", "recall"]
@@ -135,7 +142,7 @@ class MLflowLogger:
             epoch = int(row.get("epoch", 0))
             for col in metric_cols:
                 try:
-                    self.log_metric(col, float(row[col]), step=epoch)
+                    self.log_metric(sanitize(col), float(row[col]), step=epoch)
                 except (ValueError, KeyError):
                     pass
 
@@ -144,7 +151,7 @@ class MLflowLogger:
         summary = {}
         for col in metric_cols:
             try:
-                summary[f"final_{col}"] = float(last_row[col])
+                summary[f"final_{sanitize(col)}"] = float(last_row[col])
             except (ValueError, KeyError):
                 pass
         if summary:

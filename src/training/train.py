@@ -76,9 +76,20 @@ def run_training(
     imgsz       = int(train_cfg["image_size"])
     lr          = float(train_cfg["learning_rate"])
     patience    = int(train_cfg["patience"])
-    device      = train_cfg.get("device", "auto")
+    device_raw  = train_cfg.get("device", "cpu")
     workers     = int(train_cfg.get("workers", 4))
     data_version = data_cfg.get("version", "v1")
+
+    # Safe device resolution — "auto" crashes on Ultralytics when no CUDA
+    try:
+        import torch
+        if device_raw == "auto":
+            device = "0" if torch.cuda.is_available() else "cpu"
+        else:
+            device = device_raw
+    except ImportError:
+        device = "cpu"
+    logger.info(f"  Device resolved: {device_raw} → {device}")
 
     if smoke_test:
         epochs = 1
@@ -161,11 +172,26 @@ def run_training(
         )
 
         # ── Find training run output dir ──────────────────────────────────────
-        runs_dir = Path("runs/train") / run_name
-        if not runs_dir.exists():
-            # Ultralytics sometimes appends a number
-            candidates = sorted(Path("runs/train").glob(f"{run_name}*"))
-            runs_dir = candidates[-1] if candidates else Path("runs/train") / run_name
+        # Ultralytics saves to runs/detect/{name} for detection tasks
+        # even if project="runs/train" is passed — search multiple locations
+        runs_dir = None
+        search_paths = [
+            Path("runs") / "detect" / run_name,   # Ultralytics default
+            Path("runs") / "train" / run_name,
+            Path("runs") / "detect" / "runs" / "train" / run_name,  # nested case
+        ]
+        # Also search with numbered suffixes (e.g. yolov8n_v12, yolov8n_v13)
+        for candidate in search_paths:
+            if candidate.exists():
+                runs_dir = candidate
+                break
+        if runs_dir is None:
+            # Glob search as last resort
+            candidates = sorted(Path("runs").rglob(f"{run_name}"))
+            if candidates:
+                runs_dir = candidates[-1]
+        if runs_dir is None:
+            runs_dir = Path("runs") / "train" / run_name  # fallback
 
         logger.info(f"  Training output dir: {runs_dir}")
 

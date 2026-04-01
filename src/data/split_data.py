@@ -35,7 +35,12 @@ from sklearn.model_selection import train_test_split
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from src.utils.helpers import ensure_dirs, load_params, setup_logger
+from src.utils.helpers import (
+    ensure_dirs,
+    get_dataset_paths,
+    load_params,
+    setup_logger
+)
 
 logger = setup_logger("split_data")
 
@@ -49,6 +54,7 @@ def create_split(
     seed: int,
     train_ratio: float,
     val_ratio: float,
+    max_images: int = None,
     dry_run: bool = False,
     verify: bool = False,
 ) -> dict:
@@ -97,6 +103,11 @@ def create_split(
     if missing_labels:
         logger.warning(f"  {len(missing_labels)} images have no label file — they will be skipped")
         all_images = [img for img in all_images if img not in set(missing_labels)]
+
+    if max_images and len(all_images) > max_images:
+        logger.info(f"  Limiting to {max_images} images as requested (for fast CPU training)")
+        np.random.seed(seed)
+        all_images = np.random.choice(all_images, max_images, replace=False).tolist()
 
     # ── Create split ─────────────────────────────────────────────────────────
     train_images, val_images = train_test_split(
@@ -191,13 +202,14 @@ def _build_yolo_dirs(
         img_out = processed_dir / "images" / split_name
         lbl_out = processed_dir / "labels" / split_name
 
-        # Clean previous split dirs
+        # CRITICAL: Clean PREVIOUS split images/labels to avoid data mixing
         if img_out.exists():
             shutil.rmtree(img_out)
         if lbl_out.exists():
             shutil.rmtree(lbl_out)
 
         ensure_dirs(img_out, lbl_out)
+        logger.info(f"  ✓ Initialized clean {split_name} fold")
 
         for img_name in file_list:
             lbl_name = Path(img_name).with_suffix(".txt").name
@@ -234,8 +246,13 @@ def main():
     seed         = args.seed if args.seed is not None else int(split_cfg["seed"])
     train_ratio  = float(split_cfg["train_ratio"])
     val_ratio    = float(split_cfg["val_ratio"])
-    processed_dir = Path(paths_cfg["processed_data"])
-    splits_dir    = Path(paths_cfg["splits_dir"])
+    max_images   = split_cfg.get("max_images")
+    if max_images: max_images = int(max_images)
+
+    # ── Resolve dataset-specific paths ───────────────────────────────────────
+    ds_paths      = get_dataset_paths(params)
+    processed_dir = ds_paths["processed"]
+    splits_dir    = ds_paths["splits"]
 
     create_split(
         processed_dir=processed_dir,
@@ -244,6 +261,7 @@ def main():
         seed=seed,
         train_ratio=train_ratio,
         val_ratio=val_ratio,
+        max_images=max_images,
         dry_run=args.dry_run,
         verify=args.verify,
     )

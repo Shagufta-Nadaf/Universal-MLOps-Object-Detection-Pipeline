@@ -54,13 +54,17 @@ def find_model(models_dir: Path, version: str | None) -> Path:
             sys.exit(1)
         return path
 
-    candidates = sorted(models_dir.glob("yolov8_road_v*.pt"))
+    import re
+    candidates = list(models_dir.glob("yolov8_road_v*.pt"))
     if not candidates:
         logger.error(f"No trained models found in {models_dir}")
         logger.error("Run `python scripts/run_pipeline.py` or `python src/training/train.py` first.")
         sys.exit(1)
+    
+    # Numeric Sort: extract the 'vX' number and sort by it
+    candidates.sort(key=lambda x: int(re.search(r"v(\d+)", x.name).group(1)) if re.search(r"v(\d+)", x.name) else 0)
     latest = candidates[-1]
-    logger.info(f"  Auto-selected model: {latest.name}")
+    logger.info(f"  Auto-selected latest model (numeric sort): {latest.name}")
     return latest
 
 
@@ -108,7 +112,7 @@ def run_inference(
         conf=conf,
         iou=iou,
         save=save_output,
-        project=out_path,
+        project=str(Path(out_path).resolve()),
         name="detect",
         exist_ok=True,
         show=show,

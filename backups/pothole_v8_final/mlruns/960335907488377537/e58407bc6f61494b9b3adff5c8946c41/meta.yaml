@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/ML_PROJECTS/MLOPS/mlruns/960335907488377537/e58407bc6f61494b9b3adff5c8946c41/artifacts
+end_time: 1774941878736
+entry_point_name: ''
+experiment_id: '960335907488377537'
+lifecycle_stage: active
+run_id: e58407bc6f61494b9b3adff5c8946c41
+run_name: potholes-v8-lowram
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1774939236932
+status: 3
+tags: []
+user_id: Win-10

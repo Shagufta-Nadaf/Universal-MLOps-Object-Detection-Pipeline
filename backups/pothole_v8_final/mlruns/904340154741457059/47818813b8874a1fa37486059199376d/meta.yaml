@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/ML_PROJECTS/MLOPS/mlruns/904340154741457059/47818813b8874a1fa37486059199376d/artifacts
+end_time: 1774965539776
+entry_point_name: ''
+experiment_id: '904340154741457059'
+lifecycle_stage: active
+run_id: 47818813b8874a1fa37486059199376d
+run_name: bustling-finch-24
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1774965539188
+status: 3
+tags: []
+user_id: Win-10

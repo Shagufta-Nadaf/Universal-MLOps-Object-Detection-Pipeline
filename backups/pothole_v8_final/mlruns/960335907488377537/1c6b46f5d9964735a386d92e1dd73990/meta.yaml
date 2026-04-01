@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/ML_PROJECTS/MLOPS/mlruns/960335907488377537/1c6b46f5d9964735a386d92e1dd73990/artifacts
+end_time: 1774938953235
+entry_point_name: ''
+experiment_id: '960335907488377537'
+lifecycle_stage: active
+run_id: 1c6b46f5d9964735a386d92e1dd73990
+run_name: potholes-v7-precision
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1774937748040
+status: 3
+tags: []
+user_id: Win-10

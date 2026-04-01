@@ -25,12 +25,15 @@ logger = setup_logger("evaluate")
 
 
 def find_latest_model(models_dir: Path) -> Path | None:
-    """Find the most recently created .pt file in models/."""
-    candidates = sorted(models_dir.glob("yolov8_road_v*.pt"))
+    """Find the most recently created .pt file in models/ using numeric versioning."""
+    import re
+    candidates = list(models_dir.glob("yolov8_road_v*.pt"))
     if not candidates:
-        # Fallback: any .pt file
-        candidates = sorted(models_dir.glob("*.pt"))
-    return candidates[-1] if candidates else None
+        return None
+    
+    # Sort by extracting the number from the name (numeric sort)
+    candidates.sort(key=lambda x: int(re.search(r"v(\d+)", x.name).group(1)) if re.search(r"v(\d+)", x.name) else 0)
+    return candidates[-1]
 
 
 def evaluate_model(
@@ -71,6 +74,9 @@ def evaluate_model(
         save=save_plots,
         plots=save_plots,
         verbose=True,
+        project=str(Path("runs").resolve()),
+        name="pipeline_evaluate",
+        exist_ok=True,
     )
 
     # ── Extract metrics ───────────────────────────────────────────────────────

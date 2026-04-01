@@ -78,6 +78,27 @@ def get_project_root() -> Path:
     raise FileNotFoundError("Could not find project root (params.yaml not found)")
 
 
+def get_dataset_paths(params: Dict[str, Any]) -> Dict[str, Path]:
+    """
+    Build dataset-specific paths based on workspace and project name.
+    Ensures isolation between different projects (e.g. Faces vs Potholes).
+    """
+    workspace = params["data"].get("workspace", "default")
+    project = params["data"].get("project", "default")
+    paths_cfg = params["paths"]
+    
+    root = get_project_root()
+    subpath = Path(workspace) / project
+    
+    return {
+        "raw": root / paths_cfg["raw_data"] / subpath,
+        "processed": root / paths_cfg["processed_data"] / subpath,
+        "splits": root / paths_cfg["splits_dir"] / subpath,
+        "outputs": root / "outputs" / subpath,
+        "dataset_yaml": root / "configs" / workspace / f"{project}_data.yaml"
+    }
+
+
 # ─── Dataset Utilities ──────────────────────────────────────────────────────────
 
 def count_files(directory: str | Path, extension: str = ".jpg") -> int:
